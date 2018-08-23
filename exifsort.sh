@@ -1,12 +1,11 @@
 #!/bin/bash
 #
-#
 # The following are the only settings you should need to change:
 #
 # TS_AS_FILENAME: This can help eliminate duplicate images during sorting.
 # TRUE: File will be renamed to the Unix timestamp and its extension.
 # FALSE (any non-TRUE value): Filename is unchanged.
-TS_AS_FILENAME=TRUE
+TS_AS_FILENAME=FALSE
 #
 # USE_LMDATE: If this is TRUE, images without EXIF data will have their Last Modified file
 # timestamp used as a fallback. If FALSE, images without EXIF data are put in noexif/ for
@@ -28,7 +27,7 @@ USE_FILE_EXT=TRUE
 # cause .jpg to be used instead of .jpeg as the file extension. If FALSE (or any other
 # value) .jpeg is used instead. This is only used if USE_FILE_EXT is TRUE and used.
 #
-JPEG_TO_JPG=FALSE
+JPEG_TO_JPG=TRUE
 #
 #
 # The following is an array of filetypes that we intend to locate using find.
@@ -107,13 +106,14 @@ if [[ "$1" == "doAction" && "$2" != "" ]]; then
     # Unix Formatted DATE and TIME - For feeding to date()
     UFDATE=`echo $EDATE | sed y/:/-/`
     # Unix DateSTAMP
-    UDSTAMP=`date -d "$UFDATE $ETIME" +%s`
+    UDSTAMP=`date -d "$UFDATE_$ETIME" +%s`
     echo " Will rename to $UDSTAMP.$EXT"
     MVCMD="/$UDSTAMP.$EXT"
   fi;
   # DIRectory NAME for the file move
   # sed issue for y command fix provided by thomas
   DIRNAME=`echo $EDATE | sed y-:-/-`
+  DIRNAME=`date -d "$(echo $EDATE | tr -d ':')" +'%Y/%Y-%m-%d'`
   echo -n " Moving to ${MOVETO}${DIRNAME}${MVCMD} ... "
   mkdir -p "${MOVETO}${DIRNAME}" && mv -b -f "$2" "${MOVETO}${DIRNAME}${MVCMD}"
   echo "done."
